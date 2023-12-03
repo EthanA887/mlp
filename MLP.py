@@ -1,5 +1,7 @@
 import numpy as np
 
+epochs = int(input("Number of epochs: "))
+
 class Perceptron:
     """A single neuron with the sigmoid activation function.
        Attributes:
@@ -84,20 +86,13 @@ class MultiLayerPerceptron:
         x = np.array(x,dtype=object)
         y = np.array(y,dtype=object)
 
-        # Challenge: Write the Backpropagation Algorithm. 
-        # Here you have it step by step:
-
-        # STEP 1: Feed a sample to the network
         outs = self.run(x)
         
-        # STEP 2: Calculate the MSE
         error = (y - outs)
         MSE = sum(error ** 2) / self.layers[-1]
-
-        # STEP 3: Calculate the output error terms
+        
         self.d[-1] = outs * (1 - outs) * (y - outs) 
-
-        # STEP 4: Calculate the error term of each unit on each layer  
+        
         for i in reversed(range(1,len(self.network)-1)):
             for h in range(len(self.network[i])):
                 fwd_error = 0.0
@@ -105,7 +100,6 @@ class MultiLayerPerceptron:
                     fwd_error += self.network[i + 1][k].weights[h] * self.d[i + 1][k]
                 self.d[i][h] = self.values[i][h] * (1 - self.values[i][h]) * fwd_error
 
-        # STEPS 5 & 6: Calculate the deltas and update the weights
         for i in range(1,len(self.network)):
             for j in range(self.layers[i]):
                 for k in range(self.layers[i-1]+1):
@@ -116,26 +110,25 @@ class MultiLayerPerceptron:
                     self.network[i][j].weights[k] += delta
         return MSE
 
-
-# This example creates an XOR gate. Edit the number of epochs (currently 3000) and the parameters to mlp.bp to suit your application.
-"""
-mlp = MultiLayerPerceptron(layers=[2,2,1])
-print("\nTraining Neural Network as an XOR Gate...\n")
-for i in range(3000):
-    MSE = 0.0
-    MSE += mlp.bp([0,0],[0])
-    MSE += mlp.bp([0,1],[1])
-    MSE += mlp.bp([1,0],[1])
-    MSE += mlp.bp([1,1],[0])
-    MSE = MSE / 4
-    if(i%100 == 0):
-        print (MSE)
-
-mlp.printWeights()
+def gate(epochs):
+    mlp = MultiLayerPerceptron(layers=[2,2,1])
+    print("\nTraining Neural Network as an XOR Gate...\n")
+    for i in range(epochs):
+        MSE = 0.0
+        MSE += mlp.bp([0,0],[0])
+        MSE += mlp.bp([0,1],[1])
+        MSE += mlp.bp([1,0],[1])
+        MSE += mlp.bp([1,1],[0])
+        MSE = MSE / 4
+        if(i%100 == 0):
+            print (MSE)
     
-print("MLP:")
-print ("0 0 = {0:.10f}".format(mlp.run([0,0])[0]))
-print ("0 1 = {0:.10f}".format(mlp.run([0,1])[0]))
-print ("1 0 = {0:.10f}".format(mlp.run([1,0])[0]))
-print ("1 1 = {0:.10f}".format(mlp.run([1,1])[0]))
-"""
+    mlp.printWeights()
+        
+    print("MLP:")
+    print ("0 0 = {0:.10f}".format(mlp.run([0,0])[0]))
+    print ("0 1 = {0:.10f}".format(mlp.run([0,1])[0]))
+    print ("1 0 = {0:.10f}".format(mlp.run([1,0])[0]))
+    print ("1 1 = {0:.10f}".format(mlp.run([1,1])[0]))
+    
+gate(epochs)
